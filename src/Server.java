@@ -64,7 +64,7 @@ public class Server {
 				} catch (IOException e) {
 					System.out.println("Couldn't close a socket");
 				}
-				System.out.println("Connection with clients" + clientNumber + "closed"); //dslksdg
+				System.out.println("Connection with clients" + clientNumber + "closed");
 			}
 
 		}

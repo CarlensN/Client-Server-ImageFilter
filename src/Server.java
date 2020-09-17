@@ -1,3 +1,4 @@
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -19,7 +20,7 @@ public class Server {
 		userInput = new Scanner(System.in);
 		System.out.println("Enter a port number");
 		int serverPort = userInput.nextInt();
-
+		
 		// Creation de la connexion pour communiquer avec les clients
 		listener = new ServerSocket();
 		listener.setReuseAddress(true);
@@ -33,13 +34,41 @@ public class Server {
 		try {
 
 			while (true) {
-				new ClientHandler(listener.accept(), clientNumber).start();
+				ClientHandler clientHandler = new ClientHandler(listener.accept(), clientNumber);
+				clientHandler.start();
+				
+				DataInputStream dataInputStream = new DataInputStream(clientHandler.socket.getInputStream());
+				boolean done = false;
+				while(!done) 
+				{
+					byte messageType = dataInputStream.readByte();
+					
+					switch(messageType) 
+					{
+					case 1: //UserName - handles username
+						
+						break;
+						
+					case 2: //Password - handles password
+						
+						break;
+						
+					case 3: //Image - handles image
+						break;
+						
+					default:
+						done = true;
+					}
+					
+				}
 			}
 		} finally {
 			listener.close();
 			// TODO: handle finally clause
 		}
 	}
+	
+	
 
 	private static class ClientHandler extends Thread {
 		private Socket socket;

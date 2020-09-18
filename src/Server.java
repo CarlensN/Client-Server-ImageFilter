@@ -1,6 +1,6 @@
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -8,19 +8,19 @@ import java.net.Socket;
 
 import java.util.Scanner;
 
-
 public class Server {
 	private static ServerSocket listener;
 
 	public static void main(String[] args) throws Exception {
 		int clientNumber = 0;
-		Scanner scanner = new Scanner(System.in);
+		Scanner userInput = new Scanner(System.in);
 		System.out.println("Enter a server address");
-		String serverAddress = scanner.nextLine();
+		String serverAddress = userInput.nextLine();
 
+		userInput = new Scanner(System.in);
 		System.out.println("Enter a port number");
-		int serverPort = scanner.nextInt();
-		
+		int serverPort = userInput.nextInt();
+
 		// Creation de la connexion pour communiquer avec les clients
 		listener = new ServerSocket();
 		listener.setReuseAddress(true);
@@ -30,58 +30,56 @@ public class Server {
 		listener.bind(new InetSocketAddress(serverIP, serverPort));
 
 		System.out.println("the server is running on " + serverAddress + ':' + serverPort);
-		
+
 		try {
 
 			while (true) {
 				new ClientHandler(listener.accept(), clientNumber).start();
-				
 			}
 		} finally {
 			listener.close();
 			// TODO: handle finally clause
-			scanner.close();
 		}
 	}
-	
-	
 
 	private static class ClientHandler extends Thread {
 		private Socket socket;
 		private int clientNumber;
 
-		public ClientHandler(Socket socket, int clientNumber) {
+		public ClientHandler(Socket socket, int clientNumber) throws IOException {
 			this.socket = socket;
 			this.clientNumber = clientNumber;
 			System.out.println("New connection with clients" + clientNumber + "at" + socket);
+			DataInputStream dIn = new DataInputStream(socket.getInputStream());
+			boolean done = false;
+			while(!done) {
+			  byte messageType = dIn.readByte();
+
+			  switch(messageType)
+			  {
+			  case 1: // Type A
+			    System.out.println("Message A: " + dIn.readUTF());
+			    break;
+			  case 2: // Type B
+			    System.out.println("Message B: " + dIn.readUTF());
+			    break;
+			  case 3: // Type C
+			    System.out.println("Message C [1]: " + dIn.readUTF());
+			    System.out.println("Message C [2]: " + dIn.readUTF());
+			    break;
+			  default:
+			    done = true;
+			  }
+			}
+
+			dIn.close();
+
 		}
 
 		public void run() {
 			try {
 				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 				out.writeUTF("hello from server - you are client" + clientNumber);
-				ObjectInputStream objectInputStream = new ObjectInputStream(this.socket.getInputStream());
-					byte messageType = objectInputStream.readByte();
-					boolean done = false;
-					while(!done)
-					switch(messageType) 
-					{
-					case 1: //UserName - handles username
-						System.out.println(objectInputStream.readUTF());
-						break;
-						
-					case 2: //Password - handles password
-						
-						break;
-						
-					case 3: //Image - handles image
-						break;
-						
-					default:
-						System.out.println(messageType);
-						done = true;
-					}
-					
 			} catch (IOException e) {
 				// TODO: handle exception
 			} finally {

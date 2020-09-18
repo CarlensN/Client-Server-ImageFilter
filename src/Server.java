@@ -13,13 +13,12 @@ public class Server {
 
 	public static void main(String[] args) throws Exception {
 		int clientNumber = 0;
-		Scanner userInput = new Scanner(System.in);
+		Scanner scanner = new Scanner(System.in);
 		System.out.println("Enter a server address");
-		String serverAddress = userInput.nextLine();
+		String serverAddress = scanner.nextLine();
 
-		userInput = new Scanner(System.in);
 		System.out.println("Enter a port number");
-		int serverPort = userInput.nextInt();
+		int serverPort = scanner.nextInt();
 
 		// Creation de la connexion pour communiquer avec les clients
 		listener = new ServerSocket();
@@ -37,6 +36,7 @@ public class Server {
 				new ClientHandler(listener.accept(), clientNumber).start();
 			}
 		} finally {
+			scanner.close();
 			listener.close();
 			// TODO: handle finally clause
 		}

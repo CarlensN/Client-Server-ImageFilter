@@ -8,13 +8,12 @@ public class Client {
 	
 	public static void main(String[] args) throws Exception
 	{
-		Scanner userInput = new Scanner(System.in);
+		Scanner scanner = new Scanner(System.in);
 		System.out.println("Enter your IP address");
-		String serverAddress = userInput.nextLine();
+		String serverAddress = scanner.nextLine();
 		
-		userInput = new Scanner(System.in);
 		System.out.println("Enter your port number");
-		int port = userInput.nextInt();
+		int port = scanner.nextInt();
 		
 		socket = new Socket(serverAddress, port);
 		
@@ -30,6 +29,7 @@ public class Client {
 		String helloMessageFromServerString = in.readUTF();
 		System.out.println(helloMessageFromServerString);
 		
+		scanner.close();
 		socket.close();
 	}
 }

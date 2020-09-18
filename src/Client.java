@@ -1,5 +1,5 @@
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -8,13 +8,12 @@ public class Client {
 	
 	public static void main(String[] args) throws Exception
 	{
-		Scanner userInput = new Scanner(System.in);
+		Scanner scanner = new Scanner(System.in);
 		System.out.println("Enter your IP address");
-		String serverAddress = userInput.nextLine();
+		String serverAddress = scanner.nextLine();
 		
-		userInput = new Scanner(System.in);
 		System.out.println("Enter your port number");
-		int port = userInput.nextInt();
+		int port = scanner.nextInt();
 		
 		socket = new Socket(serverAddress, port);
 		
@@ -25,11 +24,12 @@ public class Client {
 		String helloMessageFromServerString = in.readUTF();
 		System.out.println(helloMessageFromServerString);
 
-		DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-		output.writeByte(1);
-		output.writeUTF("This is the first type of message.");
-		output.flush(); // 
+		ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+		oos.writeByte(1);
+		oos.writeUTF("This is the first type of message.");
+
 		
-		socket.close();
+		scanner.close();
+		//socket.close();
 	}
 }

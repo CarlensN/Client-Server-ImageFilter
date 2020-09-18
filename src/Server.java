@@ -1,6 +1,6 @@
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -8,20 +8,18 @@ import java.net.Socket;
 
 import java.util.Scanner;
 
-import com.oracle.webservices.internal.api.databinding.Databinding;
 
 public class Server {
 	private static ServerSocket listener;
 
 	public static void main(String[] args) throws Exception {
 		int clientNumber = 0;
-		Scanner userInput = new Scanner(System.in);
+		Scanner scanner = new Scanner(System.in);
 		System.out.println("Enter a server address");
-		String serverAddress = userInput.nextLine();
+		String serverAddress = scanner.nextLine();
 
-		userInput = new Scanner(System.in);
 		System.out.println("Enter a port number");
-		int serverPort = userInput.nextInt();
+		int serverPort = scanner.nextInt();
 		
 		// Creation de la connexion pour communiquer avec les clients
 		listener = new ServerSocket();
@@ -32,41 +30,17 @@ public class Server {
 		listener.bind(new InetSocketAddress(serverIP, serverPort));
 
 		System.out.println("the server is running on " + serverAddress + ':' + serverPort);
-
+		
 		try {
 
 			while (true) {
-				ClientHandler clientHandler = new ClientHandler(listener.accept(), clientNumber);
-				clientHandler.start();
+				new ClientHandler(listener.accept(), clientNumber).start();
 				
-				DataInputStream dataInputStream = new DataInputStream(clientHandler.socket.getInputStream());
-				boolean done = false;
-				while(!done) 
-				{
-					byte messageType = dataInputStream.readByte();
-					
-					switch(messageType) 
-					{
-					case 1: //UserName - handles username
-						System.out.println(dataInputStream.readUTF());
-						break;
-						
-					case 2: //Password - handles password
-						
-						break;
-						
-					case 3: //Image - handles image
-						break;
-						
-					default:
-						done = true;
-					}
-					
-				}
 			}
 		} finally {
 			listener.close();
 			// TODO: handle finally clause
+			scanner.close();
 		}
 	}
 	
@@ -86,6 +60,28 @@ public class Server {
 			try {
 				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 				out.writeUTF("hello from server - you are client" + clientNumber);
+				ObjectInputStream objectInputStream = new ObjectInputStream(this.socket.getInputStream());
+					byte messageType = objectInputStream.readByte();
+					boolean done = false;
+					while(!done)
+					switch(messageType) 
+					{
+					case 1: //UserName - handles username
+						System.out.println(objectInputStream.readUTF());
+						break;
+						
+					case 2: //Password - handles password
+						
+						break;
+						
+					case 3: //Image - handles image
+						break;
+						
+					default:
+						System.out.println(messageType);
+						done = true;
+					}
+					
 			} catch (IOException e) {
 				// TODO: handle exception
 			} finally {

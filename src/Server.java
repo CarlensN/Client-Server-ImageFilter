@@ -8,6 +8,8 @@ import java.net.Socket;
 
 import java.util.Scanner;
 
+import com.oracle.webservices.internal.api.databinding.Databinding;
+
 public class Server {
 	private static ServerSocket listener;
 
@@ -46,7 +48,7 @@ public class Server {
 					switch(messageType) 
 					{
 					case 1: //UserName - handles username
-						
+						System.out.println(dataInputStream.readUTF());
 						break;
 						
 					case 2: //Password - handles password

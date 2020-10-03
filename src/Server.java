@@ -1,4 +1,8 @@
+import java.nio.ByteBuffer;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -9,6 +13,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import java.util.Scanner;
+
+import javax.imageio.ImageIO;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -63,6 +70,8 @@ abstract public class Server {
 			try {
 				welcomeUser();
 				handleLogin();
+				BufferedImage bufferedImage = receiveImage();
+				sendImage(bufferedImage);
 
 			} catch (IOException e) {
 				// TODO: handle exception
@@ -130,6 +139,28 @@ abstract public class Server {
 			}
 			System.out.println("Account created");
 			return true;
+		}
+		public BufferedImage receiveImage() throws IOException{
+			DataInputStream in = new DataInputStream(socket.getInputStream());
+			String imageName = in.readUTF();
+			byte[] size = new byte[4];
+			in.read(size);
+			byte[] image = new byte[ByteBuffer.wrap(size).asIntBuffer().get()];
+			in.read(image);
+			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+			out.writeUTF("received image " + imageName );
+			ByteArrayInputStream is = new ByteArrayInputStream(image);
+			BufferedImage bufferedImage = ImageIO.read(is);
+			return Sobel.process(bufferedImage);
+		}
+		
+		public void sendImage(BufferedImage image) throws IOException {
+			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			ImageIO.write(image, "JPEG", os);
+			out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
+			out.write(os.toByteArray());
+			
 		}
 	}
 }

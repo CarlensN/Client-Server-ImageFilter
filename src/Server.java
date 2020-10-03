@@ -148,7 +148,7 @@ abstract public class Server {
 			byte[] image = new byte[ByteBuffer.wrap(size).asIntBuffer().get()];
 			in.read(image);
 			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-			out.writeUTF("received image " + imageName );
+			//out.writeUTF("received image " + imageName );
 			ByteArrayInputStream is = new ByteArrayInputStream(image);
 			BufferedImage bufferedImage = ImageIO.read(is);
 			return Sobel.process(bufferedImage);

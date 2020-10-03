@@ -14,6 +14,8 @@ import javax.imageio.ImageIO;
 
 
 
+
+
 public class Client {
 	private static Socket socket;
 	
@@ -58,17 +60,17 @@ public class Client {
 		out.writeUTF(imageName);
 		out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
 		out.write(os.toByteArray());
-
+		
 		byte[] size = new byte[4];
 		in.read(size);
 		byte[] image = new byte[ByteBuffer.wrap(size).asIntBuffer().get()];
 		in.read(image);
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(image);
-		
 		BufferedImage sobelImage = ImageIO.read(inputStream);
 		File outputfile = new File(imageName+"Sobel.jpg");
 		outputfile.createNewFile();
-		ImageIO.write(sobelImage, "jpg", outputfile);
+		
+		ImageIO.write(sobelImage, "JPEG", outputfile);
 		System.out.println("Image recue");
 		System.out.println("Chemin de l'image " + outputfile.getAbsolutePath());
 		scanner.close();

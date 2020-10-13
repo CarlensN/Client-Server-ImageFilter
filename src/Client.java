@@ -23,9 +23,10 @@ public class Client {
 	private static String _ipAdr = "127.0.0.1";
 	private static DataInputStream _in;
 	private static DataOutputStream _out;
+	private static String _fileType;
+	
 	public static void main(String[] args) throws Exception
 	{
-		//while(!ValidInfo());
 		
 		socket = new Socket(_ipAdr, _portNumber);
 		
@@ -93,28 +94,44 @@ public class Client {
 		_out.writeUTF(password);
 		String serverMessageString = _in.readUTF();
 		System.out.println(serverMessageString);
+		if(serverMessageString.equals("Account info invalid")) {
+			System.out.println("Please try again");
+			return false;
+		}
 		return true;
 	}
 	
-	public static void AskImage()
+	public static boolean AskImage()
 	{
+		while(!askFileType());
+		
 		System.out.println("Enter your image name");
 		_imageName = scanner.nextLine();
-		System.out.println(_imageName+".jpg");
 		BufferedImage bufferedImage;
 		try {
-			bufferedImage = ImageIO.read(new File(_imageName + ".jpg"));
+			bufferedImage = ImageIO.read(new File(_imageName + "." + _fileType));
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			ImageIO.write(bufferedImage, "JPEG", os);
-		
+			ImageIO.write(bufferedImage, _fileType, os);
+			
 			_out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
 			_out.write(os.toByteArray());
+			System.out.println("image " + _imageName +"." + _fileType + " sent");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return false;
 		}
+		return true;
 		
 
+	}
+	
+	public static boolean askFileType() {
+		System.out.println("Enter file type- Ex: png , jpg ");
+		_fileType = scanner.nextLine();
+		if(_fileType.equals("png") || _fileType.equals( "jpg")) {
+			return true;
+		}
+		System.out.println("file type not supported");
+		return false;
 	}
 	
 	public static void ReceiveImage() throws IOException {
@@ -125,12 +142,12 @@ public class Client {
 		_in.readFully(image);
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(image);
 		BufferedImage sobelImage = ImageIO.read(inputStream);
-		File outputfile = new File(_imageName+"Sobel.jpg");
+		File outputfile = new File(_imageName+"Sobel." + _fileType );
 		outputfile.createNewFile();
 		ImageIO.read(outputfile);
-		ImageIO.write(sobelImage, "JPEG", outputfile);
-		System.out.println("Image recue");
-		System.out.println("Chemin de l'image " + outputfile.getAbsolutePath());
+		ImageIO.write(sobelImage, _fileType, outputfile);
+		System.out.println("Image processed");
+		System.out.println("Image path : " + outputfile.getAbsolutePath());
 	}
 	
 }

@@ -103,6 +103,8 @@ public class Server {
 
 		public void run() {
 			try {
+				_out = new DataOutputStream(socket.getOutputStream());
+				_in = new DataInputStream(socket.getInputStream());
 				welcomeUser();
 				handleLogin();
 				_imageBuff = receiveImage();
@@ -128,8 +130,7 @@ public class Server {
 		}
 
 		public void handleLogin() throws IOException {
-			_out = new DataOutputStream(socket.getOutputStream());
-			_in = new DataInputStream(socket.getInputStream());
+		
 			String username = _in.readUTF();
 			String password = _in.readUTF();
 			handleAccountInfo(username, password);
@@ -137,8 +138,8 @@ public class Server {
 		}
 
 		public void handleAccountInfo(String username, String password) throws FileNotFoundException, IOException {
-			if (authenticateUser(username, password)) {
-				return;
+			if (!authenticateUser(username, password)) {
+				handleLogin();
 			}
 		}
 
@@ -183,23 +184,16 @@ public class Server {
 			//out.writeUTF("received image " + imageName );
 			ByteArrayInputStream is = new ByteArrayInputStream(image);
 			_imageBuff= ImageIO.read(is);
-			
-			File outputfile = new File("receive"+"Sobel.jpg");
-			outputfile.createNewFile();
-			ImageIO.write(_imageBuff, "JPEG", outputfile);
 			return Sobel.process(_imageBuff);
 		}
 		
 		public void sendImage(BufferedImage image) throws IOException{
 			_out = new DataOutputStream(socket.getOutputStream());
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			ImageIO.write(image, "JPEG", os);
+			ImageIO.write(image, "png", os);
 			_out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
 			_out.write(os.toByteArray());
 			
-			File outputfile = new File("send"+"Sobel.jpg");
-			outputfile.createNewFile();
-			ImageIO.write(image, "JPEG", outputfile);
 		}
 	}
 }

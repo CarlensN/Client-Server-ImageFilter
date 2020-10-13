@@ -103,7 +103,7 @@ public class Server {
 		public void run() {
 			try {
 				welcomeUser();
-				//handleLogin();
+				handleLogin();
 				_imageBuff = receiveImage();
 				sendImage(_imageBuff);
 
@@ -131,8 +131,6 @@ public class Server {
 			_in = new DataInputStream(socket.getInputStream());
 			String username = _in.readUTF();
 			String password = _in.readUTF();
-			String gotemString = "gotem";
-			_out.writeUTF(gotemString);
 			handleAccountInfo(username, password);
 
 		}
@@ -151,10 +149,10 @@ public class Server {
 				if (accountInfo[0].equals(username)) {
 					reader.close();
 					if (accountInfo[1].equals(password)) {
-						System.out.println("Account info valid");
+						_out.writeUTF("Account info valid");
 						return true;
 					}
-					System.out.println("Account info invalid");
+					_out.writeUTF("Account info invalid");
 					return false;
 				}
 			}
@@ -162,7 +160,7 @@ public class Server {
 			return createAccount(username, password);
 		}
 
-		public boolean createAccount(String username, String password) {
+		public boolean createAccount(String username, String password) throws IOException {
 			File database = new File("database.txt");
 			try {
 				PrintWriter pWriter = new PrintWriter(new FileOutputStream(database, true));
@@ -171,12 +169,11 @@ public class Server {
 			} catch (FileNotFoundException e) {
 				return false;
 			}
-			System.out.println("Account created");
+			_out.writeUTF("Account created");
 			return true;
 		}
 		public BufferedImage receiveImage() throws IOException{
 			_in = new DataInputStream(socket.getInputStream());
-			String imageName = _in.readUTF();
 			byte[] size = new byte[4];
 			_in.readFully(size);
 			byte[] image = new byte[ByteBuffer.wrap(size).asIntBuffer().get()];

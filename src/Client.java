@@ -37,7 +37,7 @@ public class Client {
 		String helloMessageFromServerString = _in.readUTF();
 		System.out.println(helloMessageFromServerString);
 		
-		//while(!Login());
+		while(!Login());
 		
 		AskImage();
 		ReceiveImage();
@@ -106,8 +106,7 @@ public class Client {
 			bufferedImage = ImageIO.read(new File(_imageName + ".jpg"));
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			ImageIO.write(bufferedImage, "JPEG", os);
-			
-			_out.writeUTF(_imageName);
+		
 			_out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
 			_out.write(os.toByteArray());
 		} catch (IOException e) {

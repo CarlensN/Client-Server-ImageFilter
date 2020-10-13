@@ -39,30 +39,10 @@ public class Client {
 		
 		while(!Login());
 		
-		System.out.println("Enter your image name");
-		String imageName = scanner.nextLine();
-		System.out.println(imageName+".jpg");
-		BufferedImage bufferedImage = ImageIO.read(new File(imageName + ".jpg"));
+		AskImage();
+		ReceiveImage();
+	
 		
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		ImageIO.write(bufferedImage, "JPEG", os);
-		
-		_out.writeUTF(imageName);
-		_out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
-		_out.write(os.toByteArray());
-		
-		byte[] size = new byte[4];
-		_in.read(size);
-		byte[] image = new byte[ByteBuffer.wrap(size).asIntBuffer().get()];
-		_in.read(image);
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(image);
-		BufferedImage sobelImage = ImageIO.read(inputStream);
-		File outputfile = new File(imageName+"Sobel.jpg");
-		outputfile.createNewFile();
-		
-		ImageIO.write(sobelImage, "JPEG", outputfile);
-		System.out.println("Image recue");
-		System.out.println("Chemin de l'image " + outputfile.getAbsolutePath());
 		scanner.close();
 		socket.close();
 	}
@@ -116,5 +96,42 @@ public class Client {
 		return true;
 	}
 	
+	public static void AskImage()
+	{
+		System.out.println("Enter your image name");
+		_imageName = scanner.nextLine();
+		System.out.println(_imageName+".jpg");
+		BufferedImage bufferedImage;
+		try {
+			bufferedImage = ImageIO.read(new File(_imageName + ".jpg"));
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			ImageIO.write(bufferedImage, "JPEG", os);
+			
+			_out.writeUTF(_imageName);
+			_out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
+			_out.write(os.toByteArray());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+	}
+	
+	public static void ReceiveImage() throws IOException {
+
+		byte[] size = new byte[4];
+		_in.read(size);
+		byte[] image = new byte[ByteBuffer.wrap(size).asIntBuffer().get()];
+		_in.read(image);
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(image);
+		BufferedImage sobelImage = ImageIO.read(inputStream);
+		File outputfile = new File(_imageName+"Sobel.jpg");
+		outputfile.createNewFile();
+		
+		ImageIO.write(sobelImage, "JPEG", outputfile);
+		System.out.println("Image recue");
+		System.out.println("Chemin de l'image " + outputfile.getAbsolutePath());
+	}
 	
 }

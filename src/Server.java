@@ -11,8 +11,13 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Calendar;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
+
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,6 +32,7 @@ public class Server {
 	private static String _ipAdr = "127.0.0.1";
 	private static DataInputStream _in;
 	private static DataOutputStream _out;
+	private static String _username;
 	
 	public static void main(String[] args) throws Exception {
 		int clientNumber = 0;
@@ -130,10 +136,11 @@ public class Server {
 		}
 
 		public void handleLogin() throws IOException {
-		
-			String username = _in.readUTF();
+			_out = new DataOutputStream(socket.getOutputStream());
+			_in = new DataInputStream(socket.getInputStream());
+			_username = _in.readUTF();
 			String password = _in.readUTF();
-			handleAccountInfo(username, password);
+			handleAccountInfo(_username, password);
 
 		}
 
@@ -184,6 +191,14 @@ public class Server {
 			//out.writeUTF("received image " + imageName );
 			ByteArrayInputStream is = new ByteArrayInputStream(image);
 			_imageBuff= ImageIO.read(is);
+			_imageName = _in.readUTF();
+			
+			SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
+			String timeStamp = new SimpleDateFormat("yyyy-MM-dd @ HH:mm:ss").format(Calendar.getInstance().getTime());
+			Date date = new Date(System.currentTimeMillis());
+			System.out.println(formatter.format(date));
+			System.out.println("[" +_username +" - " + _ipAdr + ":" + _portNumber + " - " + timeStamp + "] " + "Image " + _imageName + ".jpg" + " received for processing.");
+			
 			return Sobel.process(_imageBuff);
 		}
 		

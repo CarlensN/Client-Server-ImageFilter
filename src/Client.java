@@ -100,8 +100,8 @@ public class Client {
 		}
 		return true;
 	}
-	
-	public static boolean AskImage()
+	//import
+	public static void AskImage() throws IOException
 	{
 		while(!askFileType());
 		
@@ -121,7 +121,7 @@ public class Client {
 		}
 		return true;
 		
-
+		_out.writeUTF(_imageName);
 	}
 	
 	public static boolean askFileType() {

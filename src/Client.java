@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Scanner;
@@ -36,14 +37,7 @@ public class Client {
 		String helloMessageFromServerString = _in.readUTF();
 		System.out.println(helloMessageFromServerString);
 		
-		System.out.println("Enter you username:");
-		String username = scanner.nextLine();
-		_out.writeUTF(username);
-		System.out.println("Enter your password");
-		String password = scanner.nextLine();
-		_out.writeUTF(password);
-		String serverMessageString = _in.readUTF();
-		System.out.println(serverMessageString);
+		while(!Login());
 		
 		System.out.println("Enter your image name");
 		String imageName = scanner.nextLine();
@@ -108,5 +102,19 @@ public class Client {
 		_portNumber = digit;
 		return ipIsValid;
 	}
+	
+	public static boolean Login() throws IOException 
+	{
+		System.out.println("Enter your username:");
+		String userName = scanner.nextLine();
+		_out.writeUTF(userName);
+		System.out.println("Enter your password");
+		String password = scanner.nextLine();
+		_out.writeUTF(password);
+		String serverMessageString = _in.readUTF();
+		System.out.println(serverMessageString);
+		return true;
+	}
+	
 	
 }

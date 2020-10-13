@@ -27,7 +27,7 @@ public class Client {
 	
 	public static void main(String[] args) throws Exception
 	{
-		
+		while(!ValidInfo());
 		socket = new Socket(_ipAdr, _portNumber);
 		
 		System.out.format("The server is running on %s:%d\n", _ipAdr, _portNumber);

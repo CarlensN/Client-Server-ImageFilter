@@ -25,7 +25,7 @@ public class Client {
 	private static DataOutputStream _out;
 	public static void main(String[] args) throws Exception
 	{
-		//while(!ValidInfo());
+		while(!ValidInfo());
 		
 		socket = new Socket(_ipAdr, _portNumber);
 		
@@ -95,8 +95,8 @@ public class Client {
 		System.out.println(serverMessageString);
 		return true;
 	}
-	
-	public static void AskImage()
+	//import
+	public static void AskImage() throws IOException
 	{
 		System.out.println("Enter your image name");
 		_imageName = scanner.nextLine();
@@ -114,9 +114,9 @@ public class Client {
 			e.printStackTrace();
 		}
 		
-
+		_out.writeUTF(_imageName);
 	}
-	
+	//export
 	public static void ReceiveImage() throws IOException {
 
 		byte[] size = new byte[4];

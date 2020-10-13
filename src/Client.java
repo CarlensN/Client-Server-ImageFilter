@@ -118,20 +118,24 @@ public class Client {
 
 	}
 	
-	public static void ReceiveImage() throws IOException {
-
+	public static void ReceiveImage()  {
 		byte[] size = new byte[4];
-		_in.read(size);
 		byte[] image = new byte[ByteBuffer.wrap(size).asIntBuffer().get()];
-		_in.read(image);
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(image);
-		BufferedImage sobelImage = ImageIO.read(inputStream);
-		File outputfile = new File(_imageName+"Sobel.jpg");
-		outputfile.createNewFile();
-		
-		ImageIO.write(sobelImage, "JPEG", outputfile);
-		System.out.println("Image recue");
-		System.out.println("Chemin de l'image " + outputfile.getAbsolutePath());
+		try {
+			_in.read(size);
+			_in.read(image);
+			ByteArrayInputStream inputStream = new ByteArrayInputStream(image);
+			BufferedImage sobelImage = ImageIO.read(inputStream);
+			File outputfile = new File(_imageName+"Sobel.jpg");
+			outputfile.createNewFile();
+			ImageIO.write(sobelImage, "JPEG", outputfile);
+			System.out.println("Image recue");
+			System.out.println("Chemin de l'image " + outputfile.getAbsolutePath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 	
 }

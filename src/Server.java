@@ -54,10 +54,13 @@ public class Server {
 		System.out.println("Enter your ip address- Ex. 192.168.2.1");
 		_ipAdr = scanner.nextLine();
 		System.out.println("Enter a port number - Ex. 5000");
-		
+	
 		//Ip address validation
 		String ipDigits[] = _ipAdr.split("\\.");
-		if(ipDigits.length != 4 ) return false;
+		if(ipDigits.length != 4 ) {
+			scanner.close();
+			return false;
+		}
 		boolean ipIsValid = false;
 		int digit;
 		for(String digitString : ipDigits) 
@@ -66,6 +69,7 @@ public class Server {
 				digit = Integer.parseInt(digitString);
 			} catch (Exception e) {
 				System.out.println("Invalid address");
+				scanner.close();
 				return false;
 			}
 			ipIsValid = (digit >= 0 && digit <= 255) ? true : false;
@@ -74,6 +78,7 @@ public class Server {
 		
 		//Port validation
 		String port = scanner.nextLine();
+		scanner.close();
 		try {
 			digit = Integer.parseInt(port);
 		} catch (Exception e) {
@@ -82,6 +87,7 @@ public class Server {
 		}
 		ipIsValid = (digit >= 5000 && digit <= 5050) ? true : false;	
 		_portNumber = digit;
+	
 		return ipIsValid;
 	}
 
@@ -181,6 +187,9 @@ public class Server {
 			//out.writeUTF("received image " + imageName );
 			ByteArrayInputStream is = new ByteArrayInputStream(image);
 			BufferedImage bufferedImage = ImageIO.read(is);
+			File outputfile = new File("receive"+"Sobel.jpg");
+			outputfile.createNewFile();
+			ImageIO.write(bufferedImage, "JPEG", outputfile);
 			return Sobel.process(bufferedImage);
 		}
 		
@@ -190,7 +199,9 @@ public class Server {
 			ImageIO.write(image, "JPEG", os);
 			out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
 			out.write(os.toByteArray());
-			
+			File outputfile = new File("send"+"Sobel.jpg");
+			outputfile.createNewFile();
+			ImageIO.write(image, "JPEG", outputfile);
 		}
 	}
 }

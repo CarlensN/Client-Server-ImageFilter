@@ -20,13 +20,18 @@ import java.io.FileReader;
 
 public class Server {
 	private static ServerSocket listener;
+	private static String _imageName;
+	public static BufferedImage _imageBuff;
+	static Scanner scanner = new Scanner(System.in);
 	private static int _portNumber = 5000;
 	private static String _ipAdr = "127.0.0.1";
+	private static DataInputStream _in;
+	private static DataOutputStream _out;
 	
 	public static void main(String[] args) throws Exception {
 		int clientNumber = 0;
 		while(!ValidInfo());
-
+		
 		// Creation de la connexion pour communiquer avec les clients
 		listener = new ServerSocket();
 		listener.setReuseAddress(true);
@@ -50,7 +55,6 @@ public class Server {
 	
 	public static boolean ValidInfo() 
 	{
-		Scanner scanner = new Scanner(System.in);
 		System.out.println("Enter your ip address- Ex. 192.168.2.1");
 		_ipAdr = scanner.nextLine();
 		System.out.println("Enter a port number - Ex. 5000");
@@ -99,9 +103,9 @@ public class Server {
 		public void run() {
 			try {
 				welcomeUser();
-				handleLogin();
-				BufferedImage bufferedImage = receiveImage();
-				sendImage(bufferedImage);
+				//handleLogin();
+				_imageBuff = receiveImage();
+				sendImage(_imageBuff);
 
 			} catch (IOException e) {
 				// TODO: handle exception
@@ -123,12 +127,12 @@ public class Server {
 		}
 
 		public void handleLogin() throws IOException {
-			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-			DataInputStream in = new DataInputStream(socket.getInputStream());
-			String username = in.readUTF();
-			String password = in.readUTF();
+			_out = new DataOutputStream(socket.getOutputStream());
+			_in = new DataInputStream(socket.getInputStream());
+			String username = _in.readUTF();
+			String password = _in.readUTF();
 			String gotemString = "gotem";
-			out.writeUTF(gotemString);
+			_out.writeUTF(gotemString);
 			handleAccountInfo(username, password);
 
 		}
@@ -171,26 +175,33 @@ public class Server {
 			return true;
 		}
 		public BufferedImage receiveImage() throws IOException{
-			DataInputStream in = new DataInputStream(socket.getInputStream());
-			String imageName = in.readUTF();
+			_in = new DataInputStream(socket.getInputStream());
+			String imageName = _in.readUTF();
 			byte[] size = new byte[4];
-			in.read(size);
+			_in.readFully(size);
 			byte[] image = new byte[ByteBuffer.wrap(size).asIntBuffer().get()];
-			in.read(image);
-			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+			_in.readFully(image);
+			_out = new DataOutputStream(socket.getOutputStream());
 			//out.writeUTF("received image " + imageName );
 			ByteArrayInputStream is = new ByteArrayInputStream(image);
-			BufferedImage bufferedImage = ImageIO.read(is);
-			return Sobel.process(bufferedImage);
+			_imageBuff= ImageIO.read(is);
+			
+			File outputfile = new File("receive"+"Sobel.jpg");
+			outputfile.createNewFile();
+			ImageIO.write(_imageBuff, "JPEG", outputfile);
+			return Sobel.process(_imageBuff);
 		}
 		
-		public void sendImage(BufferedImage image) throws IOException {
-			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+		public void sendImage(BufferedImage image) throws IOException{
+			_out = new DataOutputStream(socket.getOutputStream());
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			ImageIO.write(image, "JPEG", os);
-			out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
-			out.write(os.toByteArray());
+			_out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
+			_out.write(os.toByteArray());
 			
+			File outputfile = new File("send"+"Sobel.jpg");
+			outputfile.createNewFile();
+			ImageIO.write(image, "JPEG", outputfile);
 		}
 	}
 }

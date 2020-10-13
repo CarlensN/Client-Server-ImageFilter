@@ -19,13 +19,13 @@ public class Client {
 	private static String _imageName;
 	public static BufferedImage _imageBuff;
 	static Scanner scanner = new Scanner(System.in);
-	private static int _portNumber;
-	private static String _ipAdr;
+	private static int _portNumber = 5000;
+	private static String _ipAdr = "127.0.0.1";
 	private static DataInputStream _in;
 	private static DataOutputStream _out;
 	public static void main(String[] args) throws Exception
 	{
-		while(!ValidInfo());
+		//while(!ValidInfo());
 		
 		socket = new Socket(_ipAdr, _portNumber);
 		
@@ -37,7 +37,7 @@ public class Client {
 		String helloMessageFromServerString = _in.readUTF();
 		System.out.println(helloMessageFromServerString);
 		
-		while(!Login());
+		//while(!Login());
 		
 		AskImage();
 		ReceiveImage();
@@ -121,14 +121,14 @@ public class Client {
 	public static void ReceiveImage() throws IOException {
 
 		byte[] size = new byte[4];
-		_in.read(size);
+		_in.readFully(size);
 		byte[] image = new byte[ByteBuffer.wrap(size).asIntBuffer().get()];
-		_in.read(image);
+		_in.readFully(image);
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(image);
 		BufferedImage sobelImage = ImageIO.read(inputStream);
 		File outputfile = new File(_imageName+"Sobel.jpg");
 		outputfile.createNewFile();
-		
+		ImageIO.read(outputfile);
 		ImageIO.write(sobelImage, "JPEG", outputfile);
 		System.out.println("Image recue");
 		System.out.println("Chemin de l'image " + outputfile.getAbsolutePath());

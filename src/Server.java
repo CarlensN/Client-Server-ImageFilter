@@ -11,37 +11,31 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 import java.util.Scanner;
-
 import javax.imageio.ImageIO;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 
-abstract public class Server {
+public class Server {
 	private static ServerSocket listener;
-
+	private static int _portNumber = 5000;
+	private static String _ipAdr = "127.0.0.1";
+	
 	public static void main(String[] args) throws Exception {
 		int clientNumber = 0;
-		Scanner scanner = new Scanner(System.in);
-		System.out.println("Enter a server address");
-		String serverAddress = scanner.nextLine();
-
-		System.out.println("Enter a port number");
-		int serverPort = scanner.nextInt();
+		while(!ValidInfo());
 
 		// Creation de la connexion pour communiquer avec les clients
 		listener = new ServerSocket();
 		listener.setReuseAddress(true);
-		InetAddress serverIP = InetAddress.getByName(serverAddress);
+		InetAddress serverIP = InetAddress.getByName(_ipAdr); 
 
 		// Association de l'adresse et du port a la connexion
-		listener.bind(new InetSocketAddress(serverIP, serverPort));
+		listener.bind(new InetSocketAddress(serverIP, _portNumber));
 
-		System.out.println("the server is running on " + serverAddress + ':' + serverPort);
+		System.out.println("the server is running on " + _ipAdr + ':' + _portNumber);
 
 		try {
 
@@ -49,10 +43,45 @@ abstract public class Server {
 				new ClientHandler(listener.accept(), clientNumber++).start();
 			}
 		} finally {
-			scanner.close();
 			listener.close();
 			// TODO: handle finally clause
 		}
+	}
+	
+	public static boolean ValidInfo() 
+	{
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Enter your ip address- Ex. 192.168.2.1");
+		_ipAdr = scanner.nextLine();
+		System.out.println("Enter a port number - Ex. 5000");
+		
+		//Ip address validation
+		String ipDigits[] = _ipAdr.split("\\.");
+		if(ipDigits.length != 4 ) return false;
+		boolean ipIsValid = false;
+		int digit;
+		for(String digitString : ipDigits) 
+		{
+			try {
+				digit = Integer.parseInt(digitString);
+			} catch (Exception e) {
+				System.out.println("Invalid address");
+				return false;
+			}
+			ipIsValid = (digit >= 0 && digit <= 255) ? true : false;
+			ipIsValid = (digitString.length() < 4) ? true : false;
+		}
+		
+		//Port validation
+		String port = scanner.nextLine();
+		try {
+			digit = Integer.parseInt(port);
+		} catch (Exception e) {
+			System.out.println("Invalid port number");
+			return false;
+		}
+		ipIsValid = (digit >= 5000 && digit <= 5050) ? true : false;	
+		return ipIsValid;
 	}
 
 	private static class ClientHandler extends Thread {

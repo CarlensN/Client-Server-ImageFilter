@@ -20,7 +20,8 @@ public class Client {
 	static Scanner scanner = new Scanner(System.in);
 	private static int _portNumber;
 	private static String _ipAdr;
-	
+	private static DataInputStream _in;
+	private static DataOutputStream _out;
 	public static void main(String[] args) throws Exception
 	{
 		while(!ValidInfo());
@@ -29,20 +30,19 @@ public class Client {
 		
 		System.out.format("The server is running on %s:%d\n", _ipAdr, _portNumber);
 		
-		DataInputStream in = new DataInputStream(socket.getInputStream());
-		DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+		_in = new DataInputStream(socket.getInputStream());
+		_out = new DataOutputStream(socket.getOutputStream());
 		
-		String helloMessageFromServerString = in.readUTF();
+		String helloMessageFromServerString = _in.readUTF();
 		System.out.println(helloMessageFromServerString);
 		
 		System.out.println("Enter you username:");
 		String username = scanner.nextLine();
-		out.writeUTF(username);
+		_out.writeUTF(username);
 		System.out.println("Enter your password");
 		String password = scanner.nextLine();
-		out.writeUTF(password);
-		in = new DataInputStream(socket.getInputStream());
-		String serverMessageString = in.readUTF();
+		_out.writeUTF(password);
+		String serverMessageString = _in.readUTF();
 		System.out.println(serverMessageString);
 		
 		System.out.println("Enter your image name");
@@ -53,14 +53,14 @@ public class Client {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		ImageIO.write(bufferedImage, "JPEG", os);
 		
-		out.writeUTF(imageName);
-		out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
-		out.write(os.toByteArray());
+		_out.writeUTF(imageName);
+		_out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
+		_out.write(os.toByteArray());
 		
 		byte[] size = new byte[4];
-		in.read(size);
+		_in.read(size);
 		byte[] image = new byte[ByteBuffer.wrap(size).asIntBuffer().get()];
-		in.read(image);
+		_in.read(image);
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(image);
 		BufferedImage sobelImage = ImageIO.read(inputStream);
 		File outputfile = new File(imageName+"Sobel.jpg");

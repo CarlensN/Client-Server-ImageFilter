@@ -81,6 +81,7 @@ public class Server {
 			return false;
 		}
 		ipIsValid = (digit >= 5000 && digit <= 5050) ? true : false;	
+		_portNumber = digit;
 		return ipIsValid;
 	}
 

@@ -40,7 +40,7 @@ public class Client {
 		
 		while(!Login());
 		
-		AskImage();
+		while(!AskImage());
 		ReceiveImage();
 	
 		
@@ -105,7 +105,7 @@ public class Client {
 	{
 		while(!askFileType());
 		
-		System.out.println("Enter your image name");
+		System.out.println("Enter your image name (without extension)");
 		_imageName = scanner.nextLine();
 		BufferedImage bufferedImage;
 		try {
@@ -115,8 +115,9 @@ public class Client {
 			
 			_out.write(ByteBuffer.allocate(4).putInt(os.size()).array());
 			_out.write(os.toByteArray());
-			System.out.println("image " + _imageName +"." + _fileType + " sent");
+			System.out.println("Image " + _imageName +"." + _fileType + " sent");
 		} catch (IOException e) {
+			System.out.println("Image not found please try again");
 			return false;
 		}
 		_out.writeUTF(_imageName + "." + _fileType);

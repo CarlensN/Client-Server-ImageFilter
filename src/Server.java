@@ -16,7 +16,6 @@ import java.util.Scanner;
 import javax.imageio.ImageIO;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -197,7 +196,7 @@ public class Server {
 			String timeStamp = new SimpleDateFormat("yyyy-MM-dd @ HH:mm:ss").format(Calendar.getInstance().getTime());
 			Date date = new Date(System.currentTimeMillis());
 			System.out.println(formatter.format(date));
-			System.out.println("[" +_username +" - " + _ipAdr + ":" + _portNumber + " - " + timeStamp + "] " + "Image " + _imageName + ".jpg" + " received for processing.");
+			System.out.println("[" +_username +" - " + _ipAdr + ":" + _portNumber + " - " + timeStamp + "] " + "Image " + _imageName + " received for processing.");
 			
 			return Sobel.process(_imageBuff);
 		}

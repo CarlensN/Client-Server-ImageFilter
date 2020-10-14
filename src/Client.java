@@ -127,7 +127,7 @@ public class Client {
 	}
 	
 	public static boolean askFileType() {
-		System.out.println("Enter file type- Ex: png , jpg ");
+		System.out.println("Enter file type-  png or jpg ");
 		_fileType = scanner.nextLine();
 		if(_fileType.equals("png") || _fileType.equals( "jpg")) {
 			return true;
